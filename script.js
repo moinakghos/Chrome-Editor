@@ -46,10 +46,24 @@ function openFile(event) {
             const fileList = document.getElementById('fileList');
             const li = document.createElement('li');
             li.textContent = file.name;
+
+            const closeBtn = document.createElement('span');
+            closeBtn.textContent = '✕';
+            closeBtn.className = 'file-close';
+            closeBtn.onclick = (event) => {
+                event.stopPropagation();
+                li.remove();
+                if (fileList.children.length === 0) {
+                    textarea.value = '';
+                }
+            };
+
+            li.appendChild(closeBtn);
+            fileList.appendChild(li);
+
             li.onclick = () => {
                 textarea.value = e.target.result;
             };
-            fileList.appendChild(li);
         };
         reader.readAsText(file);
     }
@@ -62,9 +76,19 @@ function createFile() {
     const fileList = document.getElementById('fileList');
     const li = document.createElement('li');
     li.textContent = 'Untitled';
-    li.onclick = () => {
-        textarea.value = '';
+
+    const closeBtn = document.createElement('span');
+    closeBtn.textContent = '✕';
+    closeBtn.className = 'file-close';
+    closeBtn.onclick = (event) => {
+        event.stopPropagation();
+        li.remove();
+        if (fileList.children.length === 0) {
+            textarea.value = '';
+        }
     };
+
+    li.appendChild(closeBtn);
     fileList.appendChild(li);
 }
 
