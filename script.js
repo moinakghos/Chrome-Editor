@@ -106,3 +106,14 @@ let fileStructure = {};
         topbar.classList.toggle("light-mode");
         sidebar.classList.toggle("light-mode");
     }
+
+    function updateLineNumbers() {
+        const textarea = document.getElementById('editor');
+        const lineNumbers = document.getElementById('lineNumbers');
+        const lines = textarea.value.split('\n').length; // Counts the number of lines
+        lineNumbers.innerHTML = ''; // Clears existing line numbers
+        for (let i = 1; i <= lines; i++) {
+            lineNumbers.innerHTML += `<div>${i}</div>`; // Appends new line numbers
+        }
+    }
+    
