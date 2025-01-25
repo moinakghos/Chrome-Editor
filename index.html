@@ -8,18 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="dark-mode">
+<body class="light-mode" onload="initializeLightMode()">
 
 <div class="topbar">
     <div class="dropdown">
-        <span class="cursor-pointer">File</span>
+        <span class="cursor-pointer">File ▼</span>
         <div class="dropdown-content">
             <a href="#" onclick="createFile()">New File</a>
             <a href="#" onclick="document.getElementById('fileInput').click()">Open File</a>
-            <a href="#" onclick="saveFile()">Save</a>
             <a href="#" onclick="saveAsFile()">Save As</a>
-            <a href="#" onclick="newWindow()">New Window</a>
-            <a href="#" onclick="exitApp()">Exit</a>
         </div>
     </div>
     <label class="toggle-switch">
@@ -31,7 +28,7 @@
 <div class="editor-container">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <button id="openFileButton" onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow hover:bg-blue-600 transition hidden">Open File</button>
+        <button id="openFileButton" onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow hover:bg-blue-600 transition">Open File</button>
         <ul class="file-list" id="fileList">
             <!-- File items will be dynamically inserted here -->
         </ul>
@@ -40,42 +37,12 @@
     <!-- Editor -->
     <div class="editor">
         <textarea id="editor" placeholder="Start typing..."></textarea>
+        <div id="wordCount" class="word-count">Word Count: 0</div>
     </div>
 </div>
 
 <input type="file" id="fileInput" class="hidden" onchange="openFile(event)" />
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const fileList = document.getElementById('fileList');
-        const openFileButton = document.getElementById('openFileButton');
 
-        const observer = new MutationObserver(() => {
-            if (fileList.children.length > 0) {
-                openFileButton.classList.add('hidden');
-            } else {
-                openFileButton.classList.remove('hidden');
-            }
-        });
-
-        observer.observe(fileList, { childList: true });
-    });
-
-    function openFile(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const fileName = file.name;
-                const fileList = document.getElementById('fileList');
-                const li = document.createElement('li');
-                li.textContent = fileName;
-                li.onclick = () => loadFile(fileName, e.target.result);
-                fileList.appendChild(li);
-            };
-            reader.readAsText(file);
-        }
-    }
-</script>
 <script src="script.js"></script>
 </body>
 </html>

@@ -1,108 +1,115 @@
-let fileStructure = {};
-    let currentFile = null;
+document.addEventListener('DOMContentLoaded', () => {
+    const fileList = document.getElementById('fileList');
+    const openFileButton = document.getElementById('openFileButton');
+    const wordCountElement = document.getElementById('wordCount');
+    const editor = document.getElementById('editor');
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderFileExplorer();
-
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                saveFile();
-            } else if (e.ctrlKey && e.shiftKey && e.key === 'S') {
-                e.preventDefault();
-                saveAsFile();
-            } else if (e.ctrlKey && e.key === 'o') {
-                e.preventDefault();
-                document.getElementById('fileInput').click();
-            }
-        });
+    const observer = new MutationObserver(() => {
+        if (fileList.children.length > 0) {
+            openFileButton.classList.add('hidden');
+        } else {
+            openFileButton.classList.remove('hidden');
+        }
     });
 
-    function renderFileExplorer() {
-        const fileList = document.getElementById('fileList');
-        fileList.innerHTML = '';
-        Object.keys(fileStructure).forEach(key => {
-            const li = createFileElement(key);
-            fileList.appendChild(li);
-        });
-    }
+    observer.observe(fileList, { childList: true });
 
-    function createFileElement(name) {
-        const li = document.createElement('li');
-        li.textContent = name;
-        li.style.cursor = 'pointer';
-        li.onclick = () => loadFile(name, fileStructure[name]);
-        return li;
-    }
+    // Update word count as user types
+    editor.addEventListener('input', () => {
+        const text = editor.value;
+        const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
+        wordCountElement.textContent = `Word Count: ${wordCount}`;
+    });
+});
 
-    function createFile() {
-        const fileName = prompt("Enter file name:");
-        if (!fileName) return;
+function initializeLightMode() {
+    const body = document.body;
+    body.classList.add('light-mode');
+    body.classList.remove('dark-mode');
+}
 
-        fileStructure[fileName] = '';
-        renderFileExplorer();
-    }
+function toggleMode() {
+    const body = document.body;
+    body.classList.toggle('light-mode');
+    body.classList.toggle('dark-mode');
+}
 
-    function loadFile(name, content) {
-        currentFile = name;
-        const editor = document.getElementById('editor');
-        editor.value = content;
-        document.title = `${name} - Chrome Editor`;
-    }
+function openFile(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const textarea = document.getElementById('editor');
+            textarea.value = e.target.result;
 
-    function saveFile() {
-        if (!currentFile) {
-            alert("No file is currently open to save.");
-            return;
-        }
+            // Add file to file list
+            const fileList = document.getElementById('fileList');
+            const li = document.createElement('li');
+            li.textContent = file.name;
 
-        const editorContent = document.getElementById('editor').value;
-        fileStructure[currentFile] = editorContent;
-        alert(`${currentFile} has been saved.`);
-    }
-
-    function saveAsFile() {
-        const fileName = prompt("Enter the file name for saving:", currentFile || "newFile.txt");
-        if (!fileName) return;
-
-        const editorContent = document.getElementById('editor').value;
-        fileStructure[fileName] = editorContent;
-        renderFileExplorer();
-    }
-
-    function openFile(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentFile = file.name;
-                fileStructure[file.name] = e.target.result;
-                renderFileExplorer();
-                loadFile(file.name, e.target.result);
+            const closeBtn = document.createElement('span');
+            closeBtn.textContent = '✕';
+            closeBtn.className = 'file-close';
+            closeBtn.onclick = (event) => {
+                event.stopPropagation();
+                li.remove();
+                if (fileList.children.length === 0) {
+                    textarea.value = '';
+                }
             };
-            reader.readAsText(file);
+
+            li.appendChild(closeBtn);
+            fileList.appendChild(li);
+
+            li.onclick = () => {
+                textarea.value = e.target.result;
+            };
+        };
+        reader.readAsText(file);
+    }
+}
+
+function createFile() {
+    const textarea = document.getElementById('editor');
+    textarea.value = '';
+
+    const fileList = document.getElementById('fileList');
+    const li = document.createElement('li');
+    li.textContent = 'Untitled';
+
+    const closeBtn = document.createElement('span');
+    closeBtn.textContent = '✕';
+    closeBtn.className = 'file-close';
+    closeBtn.onclick = (event) => {
+        event.stopPropagation();
+        li.remove();
+        if (fileList.children.length === 0) {
+            textarea.value = '';
         }
-    }
+    };
 
-    function newWindow() {
-        const newWin = window.open("index.html", "_blank");
-        if (!newWin) {
-            alert("Pop-ups are blocked. Please allow pop-ups for this site.");
-        }
-    }
+    li.appendChild(closeBtn);
+    fileList.appendChild(li);
+}
 
-    function exitApp() {
-        if (confirm("Are you sure you want to exit the application? Unsaved changes will be lost.")) {
-            window.close();
-        }
-    }
+async function saveAsFile() {
+    const textarea = document.getElementById('editor');
+    const content = textarea.value;
 
-    function toggleMode() {
-        const body = document.body;
-        const topbar = document.querySelector(".topbar");
-        const sidebar = document.querySelector(".sidebar");
+    const options = {
+        types: [
+            {
+                description: 'Text Files',
+                accept: {
+                    'text/plain': ['.txt', '.html', '.js', '.css'],
+                },
+            },
+        ],
+    };
 
-        body.classList.toggle("light-mode");
-        topbar.classList.toggle("light-mode");
-        sidebar.classList.toggle("light-mode");
-    }
+    const fileHandle = await window.showSaveFilePicker(options);
+    const writable = await fileHandle.createWritable();
+    await writable.write(content);
+    await writable.close();
+    alert('File saved successfully!');
+}
