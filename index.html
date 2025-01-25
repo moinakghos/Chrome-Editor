@@ -7,78 +7,8 @@
     <title>Chrome Editor</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .editor-container {
-            display: flex;
-        }
-
-        .editor {
-            position: relative;
-            flex-grow: 1;
-            background-color: #1e1e1e;
-            color: #ffffff;
-        }
-
-        .line-numbers {
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 40px;
-            background-color: #2e2e2e;
-            text-align: right;
-            padding: 5px;
-            color: #888;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        .textarea-container {
-            margin-left: 40px;
-            height: 100%;
-        }
-
-        #editor {
-            width: 100%;
-            height: 100%;
-            border: none;
-            resize: none;
-            font-family: monospace;
-            font-size: 14px;
-            background-color: #1e1e1e;
-            color: #ffffff;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: #252526;
-            color: #ffffff;
-            padding: 10px;
-            overflow-y: auto;
-        }
-
-        .file-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .file-list li {
-            padding: 5px;
-            cursor: pointer;
-        }
-
-        .file-list li:hover {
-            background-color: #373737;
-            border-radius: 5px;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
 </head>
-<body class="light-mode">
+<body class="dark-mode">
 
 <div class="topbar">
     <div class="dropdown">
@@ -101,7 +31,7 @@
 <div class="editor-container">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <button id="openFileButton" onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow hover:bg-blue-600 transition">Open File</button>
+        <button id="openFileButton" onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow hover:bg-blue-600 transition hidden">Open File</button>
         <ul class="file-list" id="fileList">
             <!-- File items will be dynamically inserted here -->
         </ul>
@@ -109,29 +39,13 @@
 
     <!-- Editor -->
     <div class="editor">
-        <div class="line-numbers" id="lineNumbers"></div>
-        <div class="textarea-container">
-            <textarea id="editor" placeholder="Start typing..." oninput="updateLineNumbers()"></textarea>
-        </div>
+        <textarea id="editor" placeholder="Start typing..."></textarea>
     </div>
 </div>
 
 <input type="file" id="fileInput" class="hidden" onchange="openFile(event)" />
-
 <script>
-    function updateLineNumbers() {
-        const textarea = document.getElementById('editor');
-        const lineNumbers = document.getElementById('lineNumbers');
-        const lines = textarea.value.split('\n').length;
-        lineNumbers.innerHTML = '';
-        for (let i = 1; i <= lines; i++) {
-            lineNumbers.innerHTML += `<div>${i}</div>`;
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-        updateLineNumbers();
-
         const fileList = document.getElementById('fileList');
         const openFileButton = document.getElementById('openFileButton');
 
@@ -151,23 +65,17 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const textarea = document.getElementById('editor');
-                textarea.value = e.target.result;
-                updateLineNumbers();
-
-                // Add file to file list
+                const fileName = file.name;
                 const fileList = document.getElementById('fileList');
                 const li = document.createElement('li');
-                li.textContent = file.name;
-                li.onclick = () => {
-                    textarea.value = e.target.result;
-                    updateLineNumbers();
-                };
+                li.textContent = fileName;
+                li.onclick = () => loadFile(fileName, e.target.result);
                 fileList.appendChild(li);
             };
             reader.readAsText(file);
         }
     }
 </script>
+<script src="script.js"></script>
 </body>
 </html>
