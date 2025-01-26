@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'n') {
             e.preventDefault();
             createFile();
-        } else if (e.ctrlKey && e.key.toLowerCase() === 'o') {
+        } else if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'o') {
             e.preventDefault();
             document.getElementById('fileInput').click();
-        } else if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+        } else if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 's') {
             e.preventDefault();
             saveAsFile();
         }
@@ -60,6 +60,19 @@ function openFile(event) {
             const fileList = document.getElementById('fileList');
             const li = document.createElement('li');
             li.textContent = file.name;
+
+            const closeBtn = document.createElement('span');
+            closeBtn.textContent = '✕';
+            closeBtn.className = 'file-close';
+            closeBtn.onclick = (event) => {
+                event.stopPropagation();
+                li.remove();
+                if (fileList.children.length === 0) {
+                    textarea.value = '';
+                }
+            };
+
+            li.appendChild(closeBtn);
             fileList.appendChild(li);
         };
         reader.readAsText(file);
@@ -73,6 +86,19 @@ function createFile() {
     const fileList = document.getElementById('fileList');
     const li = document.createElement('li');
     li.textContent = 'Untitled';
+
+    const closeBtn = document.createElement('span');
+    closeBtn.textContent = '✕';
+    closeBtn.className = 'file-close';
+    closeBtn.onclick = (event) => {
+        event.stopPropagation();
+        li.remove();
+        if (fileList.children.length === 0) {
+            textarea.value = '';
+        }
+    };
+
+    li.appendChild(closeBtn);
     fileList.appendChild(li);
 
     // Focus the editor for immediate typing
