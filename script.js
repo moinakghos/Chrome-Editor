@@ -14,6 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observer.observe(fileList, { childList: true });
 
+    // Key bindings
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'n') {
+            e.preventDefault();
+            createFile();
+        } else if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'o') {
+            e.preventDefault();
+            document.getElementById('fileInput').click();
+        } else if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            saveAsFile();
+        }
+    });
+
     // Update word count as user types
     editor.addEventListener('input', () => {
         const text = editor.value;
@@ -60,10 +74,6 @@ function openFile(event) {
 
             li.appendChild(closeBtn);
             fileList.appendChild(li);
-
-            li.onclick = () => {
-                textarea.value = e.target.result;
-            };
         };
         reader.readAsText(file);
     }
@@ -90,6 +100,9 @@ function createFile() {
 
     li.appendChild(closeBtn);
     fileList.appendChild(li);
+
+    // Focus the editor for immediate typing
+    textarea.focus();
 }
 
 async function saveAsFile() {

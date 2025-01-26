@@ -11,24 +11,31 @@
 <body class="light-mode" onload="initializeLightMode()">
 
 <div class="topbar">
+    <!-- File Dropdown -->
     <div class="dropdown">
-        <span class="cursor-pointer">File ▼</span>
+        <span class="cursor-pointer dropdown-toggle file-button">File ▼</span>
         <div class="dropdown-content">
-            <a href="#" onclick="createFile()">New File</a>
-            <a href="#" onclick="document.getElementById('fileInput').click()">Open File</a>
-            <a href="#" onclick="saveAsFile()">Save As</a>
+            <a href="#" onclick="createFile()">New File <span class="shortcut">(Ctrl+Alt+N)</span></a>
+            <a href="#" onclick="document.getElementById('fileInput').click()">Open File <span class="shortcut">(Ctrl+Alt+O)</span></a>
+            <a href="#" onclick="saveAsFile()">Save As <span class="shortcut">(Ctrl+Alt+S)</span></a>
         </div>
     </div>
-    <label class="toggle-switch">
-        <input type="checkbox" id="themeToggle" onchange="toggleMode()">
-        <span class="slider"></span>
-    </label>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+        <span>Light Mode</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="themeToggle" onchange="toggleMode()">
+            <span class="slider"></span>
+        </label>
+        <span>Dark Mode</span>
+    </div>
 </div>
 
 <div class="editor-container">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <button id="openFileButton" onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow hover:bg-blue-600 transition">Open File</button>
+        <button id="openFileButton" onclick="document.getElementById('fileInput').click()" class="small-btn">Open File</button>
         <ul class="file-list" id="fileList">
             <!-- File items will be dynamically inserted here -->
         </ul>
