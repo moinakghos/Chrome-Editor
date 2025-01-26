@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const wordCountElement = document.getElementById('wordCount');
 
     let fileContents = {}; // Object to store file names and their contents
+    let currentFile = null; // Track the currently selected file
 
     // Update file explorer visibility
     const updateFileExplorer = () => {
@@ -39,12 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const wordCount = text.length === 0 ? 0 : text.split(/\s+/).length;
         wordCountElement.textContent = `Word Count: ${wordCount}`;
 
-        // Update content for the currently selected file
-        const selectedFile = [...fileList.children].find((li) =>
-            li.classList.contains('active')
-        );
-        if (selectedFile) {
-            fileContents[selectedFile.dataset.fileName] = editor.value;
+        // Save content to the currently selected file
+        if (currentFile) {
+            fileContents[currentFile] = editor.value;
         }
     });
 
@@ -63,9 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = function (e) {
                 const content = e.target.result;
+
+                // Always add the file to the explorer freshly
                 fileContents[file.name] = content; // Store file content
-                addFileToExplorer(file.name);
-                selectFile(file.name);
+                removeFileFromExplorer(file.name); // Remove any existing file entry
+                addFileToExplorer(file.name); // Add the file afresh
+                selectFile(file.name); // Select and display the file
             };
             reader.readAsText(file);
         }
@@ -82,14 +83,15 @@ document.addEventListener('DOMContentLoaded', () => {
         closeBtn.className = 'file-close';
         closeBtn.onclick = (event) => {
             event.stopPropagation();
-            delete fileContents[fileName]; // Remove content from memory
             li.remove();
+
             if (fileList.children.length === 0) {
                 editor.value = ''; // Clear editor if no files remain
                 wordCountElement.textContent = 'Word Count: 0';
+                currentFile = null;
             } else {
-                const nextFile = fileList.firstChild;
-                selectFile(nextFile.dataset.fileName); // Select the next file if available
+                const nextFile = fileList.firstChild.dataset.fileName;
+                selectFile(nextFile); // Select the next file if available
             }
         };
 
@@ -98,6 +100,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fileList.appendChild(li);
         updateFileExplorer();
+    }
+
+    // Function to remove a file from the explorer
+    function removeFileFromExplorer(fileName) {
+        const fileItem = [...fileList.children].find((li) => li.dataset.fileName === fileName);
+        if (fileItem) {
+            fileItem.remove();
+        }
     }
 
     // Function to select a file and load its content into the editor
@@ -112,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             wordCountElement.textContent = `Word Count: ${
                 text.length === 0 ? 0 : text.split(/\s+/).length
             }`;
+            currentFile = fileName; // Set the currently active file
         }
     }
 
